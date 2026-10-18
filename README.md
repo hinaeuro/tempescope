@@ -21,3 +21,9 @@ INSTALLATION:
 For more information about the entire project, see our website at: http://tempescope.com
 
 Ken Kawamoto (ken@kawamoto.co.uk)
+
+## XIAO ESP32S3 port
+
+See [the ESP32S3 migration notes](docs/esp32s3/README.md) for wiring, safety gates,
+weather retrieval, Matter/Alexa setup, build instructions and verification limits.
+The original AVR firmware is retained unchanged.
