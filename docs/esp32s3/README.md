@@ -6,6 +6,11 @@
 Arduino-ESP32 **3.3.8**、ArduinoJson **7.3.1**、通常版Seeed XIAO ESP32S3を対象とする。
 旧AVRファームとBLEアプリは変更していない。新ファームは `firmware/xiao_s3/`。
 
+## USBコマンドで動かすデモ
+
+LEDの色・ファン・ポンプ・ミストを個別に操作する場合は、[デモの操作・書き込み手順](demo-ja.md)を参照。
+ソースは `firmware/xiao_s3_demo/xiao_s3_demo.ino`。通常ファームとは別に書き込む。
+
 ## はじめに
 
 ソースの取得・Arduino IDEの準備・USB書き込みは、[Windows向け日本語書き込み手順](flashing-ja.md)から進める。

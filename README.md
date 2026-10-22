@@ -6,6 +6,7 @@
 
 **ESP32S3版は `master` ではなく、`esp32s3/xiao-weather-matter` ブランチにある。**
 
+- [LED・ファン・ポンプ・ミストをUSBコマンドで操作するデモ](https://github.com/hinaeuro/tempescope/blob/esp32s3/xiao-weather-matter/docs/esp32s3/demo-ja.md)
 - [ESP32S3版のソースを開く](https://github.com/hinaeuro/tempescope/tree/esp32s3/xiao-weather-matter/firmware/xiao_s3)
 - [日本語の書き込み手順（Windows・Arduino IDE）](https://github.com/hinaeuro/tempescope/blob/esp32s3/xiao-weather-matter/docs/esp32s3/flashing-ja.md)
 - [現在の実装配線と試運転コマンド](https://github.com/hinaeuro/tempescope/blob/esp32s3/xiao-weather-matter/docs/esp32s3/as-built.md)
