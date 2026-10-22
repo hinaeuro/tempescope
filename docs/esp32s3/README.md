@@ -1,5 +1,7 @@
 # XIAO ESP32S3移植
 
+**2026-10-22更新:** 今回の実装回路は[実装配線と試運転](as-built.md)を先に読むこと。既定はUSBシリアルのベンチモード。以下のWi-Fi/Matter説明は自動モードのもの。
+
 元master `eef729041b61eb9d43cc1621082516c81ce04cbc` を保持した追加実装。
 Arduino-ESP32 **3.3.8**、ArduinoJson **7.3.1**、通常版Seeed XIAO ESP32S3を対象とする。
 旧AVRファームとBLEアプリは変更していない。新ファームは `firmware/xiao_s3/`。
@@ -19,7 +21,7 @@ Arduino-ESP32 **3.3.8**、ArduinoJson **7.3.1**、通常版Seeed XIAO ESP32S3を
 - 水位・停止入力は10ms周期の別タスク。HTTP待ち中も監視する。異常はラッチし、OFF＋安全条件復帰＋resetで解除。
 - 再起動は常にOFF。Wi-Fi切断、天気期限切れでOFF指令に戻し、復旧後は新しいON操作が必要。
 
-**初期設定は `TEMPESCOPE_HARDWARE_VALIDATED=0` で全出力を禁止する。**
+**自動モードの初期設定は `TEMPESCOPE_HARDWARE_VALIDATED=0` で全出力を禁止する。ベンチモードではLED・ファンのみ試験可能。**
 回路の未確認点があるため、実機チェック完了後にだけローカル設定で1にする。
 ビルド成功はポンプ電流、LED型番、リレーの突入電流適合、Alexa登録の成功を意味しない。
 

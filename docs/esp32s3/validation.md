@@ -54,3 +54,13 @@ BUILD_OUTPUT_DIR=/tmp/tempescope-esp32s3-enabled bash scripts/build-esp32s3.sh \
 
 したがって「ビルド可能な移植実装・配線設計・試験手順」の段階であり、「実機で動作確認済みの完成機」ではない。
 実機投入の順序と合格条件は [commissioning.md](commissioning.md) を参照する。
+
+## 2026-10-22 実装回路対応
+
+- image(3).pngの配線を目視照合し、ポンプD0、ミストD1、ファンD2、RGB D10/D9/D8に更新。
+- USBシリアルのベンチモードを追加。試験時の水位/停止入力の偽装はしない。
+- 新規ベンチテスト・従来安全制御・天気JSONテストをC++17、ASan/UBSan（detect_leaks=0）で実行し合格。
+  出力期限、追加指令拒否、液体負荷の許可/共通60秒間隔、off、時計周回、ドライバ異常時停止を検証。
+- Arduino CLIは取得できたが、ESP32コア/ライブラリのインデックス取得がDNS/network unreachableで失敗。
+  この変更後のESP32-S3向けフルビルドは未完了。以前のビルド成功を今回の変更の検証とは扱わない。
+- 実機書込み・RGBの実際の色・起動ストラップ・WDT・電流/温度/流量は未検証。

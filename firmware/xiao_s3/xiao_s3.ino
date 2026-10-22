@@ -10,6 +10,7 @@
 #include <esp_task_wdt.h>
 #include "Config.h"
 #include "Safety.h"
+#include "Bench.h"
 #include "WeatherData.h"
 
 #if !CONFIG_IDF_TARGET_ESP32S3
@@ -28,6 +29,7 @@ std::atomic<bool> requested{false}, resetRequested{false}, ready{false};
 std::atomic<uint32_t> loopBeat{0};
 std::atomic<Fault> reportedFault{Fault::None};
 QueueHandle_t weatherQueue;
+Bench bench;
 constexpr uint32_t kFreshMs = 30 * 60 * 1000;
 constexpr uint32_t kPollMs = 10 * 60 * 1000;
 
@@ -153,8 +155,23 @@ void setup() {
   const int outputs[] = {kPumpPin,kMistPin,kFanPin,kRedPin,kGreenPin,kBluePin};
   for (int pin : outputs) { digitalWrite(pin, LOW); pinMode(pin, OUTPUT); }
   allOff();
-  for (int pin : {kPumpWaterPin,kMistWaterPin,kStopPin,kResetPin}) pinMode(pin, INPUT_PULLUP);
   Serial.begin(115200);
+  if (TEMPESCOPE_BENCH_MODE) {
+    // No unconnected safety inputs are treated as safe, and no remote actuation.
+    bool ok = ledcAttach(kRedPin, 2000, 8);
+    ok = ledcAttach(kGreenPin, 2000, 8) && ok;
+    ok = ledcAttach(kBluePin, 2000, 8) && ok;
+    bench.driverOK = ok;
+    esp_task_wdt_config_t wdt = { .timeout_ms = 2000, .idle_core_mask = 0, .trigger_panic = true };
+    esp_err_t result = esp_task_wdt_add(nullptr);
+    if (result == ESP_ERR_INVALID_STATE) {
+      if (esp_task_wdt_init(&wdt) == ESP_OK) result = esp_task_wdt_add(nullptr);
+    }
+    if (result == ESP_OK && esp_task_wdt_reconfigure(&wdt) != ESP_OK) result = ESP_FAIL;
+    bench.driverOK = bench.driverOK && result == ESP_OK;
+    return;
+  }
+  for (int pin : {kPumpWaterPin,kMistWaterPin,kStopPin,kResetPin}) pinMode(pin, INPUT_PULLUP);
   weatherQueue = xQueueCreate(1, sizeof(WeatherSample));
   if (!weatherQueue) return; // outputs remain LOW; no Matter or network startup
   if (xTaskCreate(controlTask, "safety", 4096, nullptr, 5, nullptr) != pdPASS) return;
@@ -168,6 +185,42 @@ void setup() {
 }
 
 void loop() {
+  if (TEMPESCOPE_BENCH_MODE) {
+    // Deadline checking also occurs during input; an input flood cannot hold ON.
+    static char command[32]; static size_t length = 0; static bool overflow = false;
+    static bool announced = false;
+    if (!announced && Serial) {
+      Serial.println("BENCH: red green blue white fan (5s), mist (2s), pump (1s), off, status");
+      Serial.println("No water/stop sensors. No Wi-Fi/Matter in bench mode. Liquid outputs locked by default.");
+      announced = true;
+    }
+    for (int count = 0; count < 64 && Serial.available(); ++count) {
+      char c = Serial.read();
+      if (c == '\r') continue;
+      if (c == '\n') {
+        command[length] = 0;
+        if (!overflow) {
+          if (!strcmp(command, "status")) {
+            Serial.printf("bench=1 driver=%d pump_allowed=%d mist_allowed=%d active=%d\n",
+              bench.driverOK, bool(TEMPESCOPE_BENCH_PUMP_ENABLED),
+              bool(TEMPESCOPE_BENCH_MIST_ENABLED), bench.active(millis()));
+          } else if (!bench.command(command, millis(), TEMPESCOPE_BENCH_PUMP_ENABLED,
+                                    TEMPESCOPE_BENCH_MIST_ENABLED)) {
+            Serial.println("Rejected: locked, busy, cooldown, driver failure or unknown command");
+          } else Serial.println("OK");
+        } else { bench.stop(millis()); Serial.println("Command too long; stopped"); }
+        length = 0; overflow = false;
+      } else if (length < sizeof(command)-1) command[length++] = c;
+      else overflow = true;
+    }
+    const Outputs out = bench.tick(millis());
+    digitalWrite(kPumpPin, out.pump); digitalWrite(kMistPin, out.mist);
+    digitalWrite(kFanPin, out.fan);
+    ledcWrite(kRedPin, out.red); ledcWrite(kGreenPin, out.green); ledcWrite(kBluePin, out.blue);
+    if (bench.driverOK) esp_task_wdt_reset();
+    delay(10);
+    return;
+  }
   loopBeat.store(millis());
   // Fixed buffer, never block the supervisor waiting for a newline.
   static char command[32]; static size_t length = 0; static bool overflow = false;
