@@ -20,7 +20,7 @@
 #define TEMPESCOPE_BENCH_PUMP_ENABLED 0
 #endif
 #ifndef TEMPESCOPE_BENCH_MIST_ENABLED
-#define TEMPESCOPE_BENCH_MIST_ENABLED 0
+#define TEMPESCOPE_BENCH_MIST_ENABLED 1
 #endif
 // Raw SoC GPIO numbers, NOT Arduino Uno pin numbers.
 constexpr int kPumpPin = 1;   // D0
