@@ -52,7 +52,7 @@ MatterはESP32コアに同梱される。名前の似た別のMatterライブラ
 |---|---:|---|
 |`TEMPESCOPE_BENCH_MODE`|1|USBシリアルから単発試運転。Wi-Fi・Matterは起動しない|
 |`TEMPESCOPE_BENCH_PUMP_ENABLED`|0|ポンプ試運転を禁止|
-|`TEMPESCOPE_BENCH_MIST_ENABLED`|0|ミスト試運転を禁止|
+|`TEMPESCOPE_BENCH_MIST_ENABLED`|1|ミストの2秒試運転を許可|
 |`TEMPESCOPE_HARDWARE_VALIDATED`|0|自動モードの物理出力を禁止。ベンチのLED・ファン試験は可能|
 
 IDE左上の「✓」（検証）でコンパイルする。初回は時間がかかる。
@@ -83,7 +83,7 @@ D2/GPIO3は起動設定に関係するため、外付け回路接続時だけ失
 起動案内に `BENCH` と出ることを確認し、入力欄から `status` を送る。
 
 ```text
-bench=1 driver=1 pump_allowed=0 mist_allowed=0 active=0
+bench=1 driver=1 pump_allowed=0 mist_allowed=1 active=0
 ```
 
 これは正常時の表示例。実際の値を確認する。
@@ -93,7 +93,7 @@ bench=1 driver=1 pump_allowed=0 mist_allowed=0 active=0
 |`bench=1`|USBシリアル試運転モード|
 |`driver=1`|PWMと監視タイマーの初期化成功。外部回路の正常判定ではない|
 |`pump_allowed=0`|ポンプ試運転は禁止|
-|`mist_allowed=0`|ミスト試運転は禁止|
+|`mist_allowed=1`|ミスト試運転を許可|
 |`active=0`|現在は停止中|
 
 USB単体ではコマンド応答だけを確認し、外部回路接続後の試験は[実装配線と試運転](as-built.md)に従う。
@@ -103,7 +103,7 @@ USB単体ではコマンド応答だけを確認し、外部回路接続後の�
 |`red` / `green` / `blue` / `white`|赤・緑・青・白を最大5秒点灯（PWM 64/255）|
 |`fan`|ファンを最大5秒運転|
 |`pump`|ポンプを最大1秒運転。既定では拒否|
-|`mist`|ミストを最大2秒運転。既定では拒否|
+|`mist`|ミストを最大2秒運転。既定で許可|
 |`off`|全出力を停止|
 |`status`|状態を表示|
 
@@ -149,3 +149,9 @@ binを保存したい場合は、ボード設定後に「スケッチ → コン
 Windowsで初めて使う場合は、このページのArduino IDE手順で進めればよい。
 
 参考: [Seeed公式・日本語の導入ガイド](https://wiki.seeedstudio.com/ja/xiao_esp32s3_getting_started/)
+
+## 2026-10-23 ファン・ミスト試運転設定
+
+ファンは従来から許可済み。ミストの既定値を1に変更した。
+既に `LocalConfig.h` がある場合、その `TEMPESCOPE_BENCH_MIST_ENABLED` も1へ変更して再ビルド・再書き込みする。
+ポンプの許可は0のまま。GPIO対応は上記の配線資料を参照。
