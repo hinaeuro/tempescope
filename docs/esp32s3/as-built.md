@@ -26,7 +26,7 @@ TD62083接続時の電源投入・USB書込み・リセット成功とファン�
 |---|---|
 |red / green / blue / white|PWM 64/255、最大5秒|
 |fan|最大5秒|
-|mist|最大2秒。初期状態は拒否|
+|mist|最大2秒。2026-10-23より既定で許可|
 |pump|最大1秒。初期状態は拒否|
 |off|全出力OFF|
 |status|モード・ドライバ初期化・負荷許可・動作中の状態|
@@ -37,7 +37,7 @@ offしても間隔は解除しない。USB切断後も時間上限で停止す�
 
 `LocalConfig.example.h` を `LocalConfig.h` にコピーして設定する。
 LED・ファンの試験には `TEMPESCOPE_HARDWARE_VALIDATED` の変更は不要。
-ミストは5V電源/リレー駆動と水深を確認後、`TEMPESCOPE_BENCH_MIST_ENABLED=1` で許可。
+ミストは `TEMPESCOPE_BENCH_MIST_ENABLED=1` として既定で許可（2026-10-23）。実負荷の試験前に5V電源/リレー駆動と水深を確認する。
 ポンプは以下の電気的課題を解消し、水を入れて監視できる場合のみ
 `TEMPESCOPE_BENCH_PUMP_ENABLED=1` で許可。ベンチモードに空運転検知はない。
 この許可は自動運転の水位保護の代わりにはならない。
@@ -64,3 +64,9 @@ LED・ファンの試験には `TEMPESCOPE_HARDWARE_VALIDATED` の変更は不�
 `TEMPESCOPE_HARDWARE_VALIDATED=1` にする。自動モードでは従来の水位/停止保護、
 Wi-Fi断・天気期限切れでOFF、復旧後再ON要求を維持する。
 現在の水位/停止なしの構成で自動モードを有効にしても、未接続入力によって負荷は停止する。
+
+## 2026-10-23 ファン・ミスト試運転設定
+
+ファンは従来から許可済み。ミストの既定値を1に変更した。
+既に `LocalConfig.h` がある場合、その `TEMPESCOPE_BENCH_MIST_ENABLED` も1へ変更して再ビルド・再書き込みする。
+ポンプの許可は0のまま。GPIO対応は上記の配線資料を参照。
