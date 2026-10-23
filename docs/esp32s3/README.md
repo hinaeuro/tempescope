@@ -11,11 +11,16 @@ Arduino-ESP32 **3.3.8**、ArduinoJson **7.3.1**、通常版Seeed XIAO ESP32S3を
 LEDの色・ファン・ポンプ・ミストを個別に操作する場合は、[デモの操作・書き込み手順](demo-ja.md)を参照。
 ソースは `firmware/xiao_s3_demo/xiao_s3_demo.ino`。通常ファームとは別に書き込む。
 
+## ソース構成
+
+[層構成・静的領域・実装方針](architecture-ja.md)にファイルの役割、依存方向、タスクの所有者を記載。
+ソース取得時は共有する `firmware/common` も含め、リポジトリをフォルダごと取得する。
+
 ## はじめに
 
 ソースの取得・Arduino IDEの準備・USB書き込みは、[Windows向け日本語書き込み手順](flashing-ja.md)から進める。
 現在の配線での試運転は[実装配線と試運転](as-built.md)を参照する。
-コンパイル済みファームは公開していない。10月22日の変更後はフルビルド未完了・実機未検証。
+コンパイル済みファームは公開していない。10月24日にBENCH・自動モード（出力禁止/有効）・別デモのビルドを確認済み。実機の電気的動作は未検証。
 
 ## 読む順序
 
@@ -62,3 +67,4 @@ LEDの色・ファン・ポンプ・ミストを個別に操作する場合は�
 - [Open-Meteo API](https://open-meteo.com/en/docs) / [利用条件](https://open-meteo.com/en/terms)
 
 天気データ: Open-Meteo.com。非商用公開APIを想定し、商用利用は利用条件・契約を別途確認する。
+

@@ -1,6 +1,7 @@
 #include <cassert>
 #include "../../firmware/xiao_s3/Bench.h"
 using namespace tempescope;
+/** 関数名: main / 内容: 対象制御の回帰テストを実行する。出力: 成功0、失敗時assertで停止。 */
 int main() {
   Bench b;
   assert(!b.command("fan", 0, true, true));
@@ -23,8 +24,9 @@ int main() {
   assert(b.command("off", 65001, true, true));
   assert(!b.command("pump", 65002, true, true));
   assert(!b.command("invalid", 65002, true, true));
-  Bench r; r.driverOK = true;
-  assert(r.command("blue", UINT32_MAX-100, false, false));
+  Bench r;
+  r.driverOK = true;
+  assert(r.command("blue", UINT32_MAX - 100, false, false));
   assert(r.tick(0).blue == 64);
   assert(!r.tick(4899).blue);
   assert(r.command("fan", 5000, false, false));

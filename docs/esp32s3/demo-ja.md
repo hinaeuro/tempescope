@@ -8,7 +8,9 @@ Wi-Fi・Alexa・天気API・ArduinoJson・Matterの設定は不要。
 
 ブランチは `esp32s3/xiao-weather-matter`。
 **開くファイルは `firmware/xiao_s3_demo/xiao_s3_demo.ino`**。
-同じフォルダの `Demo.h` も必要なので、フォルダごと取得する。
+共有する `firmware/common` も必要なので、リポジトリ全体を取得し、フォルダ構成を維持する。
+`Demo.h` は互換入口で、実装は `firmware/common/library/Demo.h` にある。
+層とメモリの設計は[構成資料](architecture-ja.md)を参照。
 
 [書き込み手順](flashing-ja.md)のArduino IDE準備・ボード設定・USB書き込みに従い、
 開くスケッチだけを上記に変える。このデモの追加ライブラリは不要で、ESP32コア3.3.8を使う。
@@ -119,5 +121,8 @@ D2/GPIO3は起動設定に関わる端子なので、外付け回路ありで起
 不正数値・過大時間の拒否、ポンプ/ミストの排他・60秒間隔、
 全停止・許可解除・初期化失敗・32bit時計周回を検証する。
 2026-10-22: 上記ホストテストはASan/UBSan有効で合格。
-この環境にはArduino CLI・ESP32コアがなく、ESP32向けコンパイル・実機書き込みは未実施。
+10月22日時点ではArduino CLI・ESP32コアがなく、ESP32向けコンパイル・実機書き込みは未実施だった。
 ESP32実機のビルド・書き込み・動作確認とは区別する。
+
+
+2026-10-24: 層分離後のデモをArduino-ESP32 3.3.8でコンパイル・リンク成功。実機書き込みと電気的動作は未検証。CLIでは `bash scripts/build-demo.sh` を使用できる。

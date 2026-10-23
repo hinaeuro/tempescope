@@ -1,5 +1,7 @@
 # 検証記録
 
+最新の層分離・静的領域対応の検証は末尾の「2026-10-24」を参照。
+
 実施日:2026-10-18。実機は接続していない。
 元master:`eef729041b61eb9d43cc1621082516c81ce04cbc`。
 作業ブランチ:`esp32s3/xiao-weather-matter`。
@@ -64,3 +66,42 @@ BUILD_OUTPUT_DIR=/tmp/tempescope-esp32s3-enabled bash scripts/build-esp32s3.sh \
 - Arduino CLIは取得できたが、ESP32コア/ライブラリのインデックス取得がDNS/network unreachableで失敗。
   この変更後のESP32-S3向けフルビルドは未完了。以前のビルド成功を今回の変更の検証とは扱わない。
 - 実機書込み・RGBの実際の色・起動ストラップ・WDT・電流/温度/流量は未検証。
+
+
+## 2026-10-24 層分離・関数コメント・静的領域対応
+
+対象: ESP32S3通常/BENCH版と別USBデモ。旧AVR/iOSのコードは変更していない。
+構成とSDK依存部分の扱いは[構成資料](architecture-ja.md)を参照。
+
+- アプリ、共通ドライバー、ハードウェアに依存しないライブラリを分離。
+- Matter受信はドライバー内のatomicメールボックスへ保存し、アプリからポーリング。
+- GPIO/PWM/WDTを共通化し、コマンドと時間制限・ミスト許可設定は維持。
+- 自作タスクのTCB/スタック、1要素キュー、HTTP応答/URL/受信行を固定領域へ配置。
+- ArduinoJsonの確保先を固定16KiB領域へ変更。SDK内部の動的確保は残る。
+- 各自作関数に関数名・内容・必要な入出力と注意事項を追加し、整形方針を統一。
+
+ホストテスト: C++17、ASan/UBSan有効（detect_leaks=0）。
+安全判定、BENCH、デモ、JSON解析の回帰テストはすべて成功。
+固定JSON領域の整列・容量超過・次回復帰・2000回反復とmalloc/realloc不使用、
+受信行の境界を追加検証。依存層と静的タスク/キューAPIの配置チェックも成功。
+
+実コンパイル環境: Linux x86_64、Arduino CLI 1.5.2-rc.1、Arduino-ESP32 3.3.8、
+ArduinoJson 7.3.1、Xtensa GCC 14.2.0。
+FQBN: `esp32:esp32:XIAO_ESP32S3:PartitionScheme=max_app_8MB,PSRAM=opi,CDCOnBoot=cdc`。
+自動モードの2設定は、一時LocalConfig.hでBENCH_MODE=0、HARDWARE_VALIDATED=0/1を指定した。
+検証後に一時ファイルを削除し、リポジトリの既定BENCH設定を維持する。
+
+|構成|結果|プログラム領域|静的RAM|
+|---|---|---:|---:|
+|通常ファームの既定BENCH|成功|1,863,069 bytes|102,472 bytes|
+|自動モード・出力禁止|成功|2,126,765 bytes|147,424 bytes|
+|自動モード・出力有効|成功|2,127,225 bytes|147,424 bytes|
+|別USBデモ|成功|306,268 bytes|22,284 bytes|
+
+外部SDKのHAL/TinyUSBヘッダーにmissing-field-initializers警告がある。
+自作ソースに由来する警告・エラーは確認されなかった。
+メモリ使用量はリンク時の値で、Matter/BLE/HTTPSの実行時ヒープ余裕や
+各タスクのスタック高水位を保証するものではない。
+
+実機の書き込み・GPIO波形・水位/停止・USB抜去・停止時間・電流/温度・
+Alexa登録と天気APIの実通信は今回も未検証。実機確認手順に従って段階的に検証する。

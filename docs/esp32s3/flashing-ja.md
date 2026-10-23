@@ -9,7 +9,8 @@
 1. [ESP32S3ブランチ](https://github.com/hinaeuro/tempescope/tree/esp32s3/xiao-weather-matter)を開く。
 2. ブランチ名が `esp32s3/xiao-weather-matter` になっていることを確認する。
 3. 緑色の「Code」→「Download ZIP」で取得し、ZIPを展開する。
-4. 展開先に `firmware/xiao_s3/xiao_s3.ino` があることを確認する。
+4. 展開先に `firmware/xiao_s3/xiao_s3.ino` と共有ソースの `firmware/common/` があることを確認する。
+   スケッチだけを取り出さず、リポジトリ全体のフォルダ構成を維持する。
 
 `master` のZIPにはESP32S3版がない。旧版の `OpenTempescope.ino` ではなく `xiao_s3.ino` を開く。
 
@@ -57,7 +58,7 @@ MatterはESP32コアに同梱される。名前の似た別のMatterライブラ
 
 IDE左上の「✓」（検証）でコンパイルする。初回は時間がかかる。
 失敗した場合は書き込みへ進まず、出力欄のエラーを確認する。
-**10月18日の旧状態はビルド成功の記録があるが、10月22日の配線・ベンチモード変更後はフルビルド未完了。現在のソースの成功を確認済みとはしていない。**
+**10月24日: 配線・BENCH変更と層分離後のソースについて、ESP32S3向けコンパイル・リンクを確認済み。実機の電気的動作は別途確認する。**
 
 ## 5. USBで書き込み
 
@@ -129,7 +130,10 @@ Windowsで拡張子を表示し、`LocalConfig.h.txt` にならないように�
 
 |ファイル・場所|役割|
 |---|---|
-|`firmware/xiao_s3/xiao_s3.ino`|起動処理、USBコマンド、Wi-Fi・Matter・天気取得|
+|`firmware/xiao_s3/xiao_s3.ino`|Arduinoのsetup/loop入口|
+|`firmware/xiao_s3/Application.h`|起動・USBコマンド・タスク周期の接続|
+|`firmware/common/drivers/`|GPIO/PWM・USB・監視・Wi-Fi/Matter/HTTPSの適合処理|
+|`firmware/common/library/`|安全・BENCH・デモ・JSON解析などの共通実装|
 |`firmware/xiao_s3/Config.h`|GPIO割り当てと既定設定|
 |`firmware/xiao_s3/LocalConfig.example.h`|個人設定のひな形|
 |`firmware/xiao_s3/Bench.h`|単発試運転の制御|
@@ -155,3 +159,6 @@ Windowsで初めて使う場合は、このページのArduino IDE手順で進�
 ファンは従来から許可済み。ミストの既定値を1に変更した。
 既に `LocalConfig.h` がある場合、その `TEMPESCOPE_BENCH_MIST_ENABLED` も1へ変更して再ビルド・再書き込みする。
 ポンプの許可は0のまま。GPIO対応は上記の配線資料を参照。
+
+
+ソースの層構成・静的領域の方針は[構成資料](architecture-ja.md)を参照。

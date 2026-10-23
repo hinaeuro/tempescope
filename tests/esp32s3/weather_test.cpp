@@ -3,25 +3,28 @@
 #include <stdio.h>
 #include "../../firmware/xiao_s3/WeatherData.h"
 using namespace tempescope;
-bool parse(const char *s, int64_t now=1800000000) {
+/** 関数名: parse / 内容: 指定JSONをテスト時刻で検証する。入力: s/now。出力: 解析成否。 */
+bool parse(const char* s, int64_t now = 1800000000) {
   WeatherSample sample;
-  return parseWeather(s,strlen(s),now,42,sample);
+  return parseWeather(s, strlen(s), now, 42, sample);
 }
+/** 関数名: main / 内容: 対象制御の回帰テストを実行する。出力: 成功0、失敗時assertで停止。 */
 int main() {
-  const char *valid=R"({"current":{"time":1799999999,"weather_code":61,"is_day":1}})";
+  const char* valid = R"({"current":{"time":1799999999,"weather_code":61,"is_day":1}})";
   WeatherSample s;
-  assert(parseWeather(valid,strlen(valid),1800000000,42,s));
-  assert(s.scene==Scene::Rain&&s.day&&s.received==42&&s.observed==1799999999);
-  assert(!parse(valid,0)); // uninitialized clock
-  assert(!parse(valid,1800001799)); // exactly 30 min old
-  assert(!parse(valid,1799999998)); // future observation
-  for(const char *bad : {"{}","null","{broken", R"({"error":true})",
-    R"({"current":{"time":1799999999,"weather_code":null,"is_day":1}})",
-    R"({"current":{"time":1799999999,"weather_code":4,"is_day":1}})",
-    R"({"current":{"time":1799999999,"weather_code":61,"is_day":2}})",
-    R"({"current":{"time":1799999999,"weather_code":"61","is_day":1}})",
-    R"({"current":{"time":1799999999,"weather_code":61}})",
-    R"({"current":{"time":"1799999999","weather_code":61,"is_day":1}})"})
+  assert(parseWeather(valid, strlen(valid), 1800000000, 42, s));
+  assert(s.scene == Scene::Rain && s.day && s.received == 42 && s.observed == 1799999999);
+  assert(!parse(valid, 0));           // uninitialized clock
+  assert(!parse(valid, 1800001799));  // exactly 30 min old
+  assert(!parse(valid, 1799999998));  // future observation
+  for (const char* bad : {"{}", "null", "{broken", R"({"error":true})",
+                          R"({"current":{"time":1799999999,"weather_code":null,"is_day":1}})",
+                          R"({"current":{"time":1799999999,"weather_code":4,"is_day":1}})",
+                          R"({"current":{"time":1799999999,"weather_code":61,"is_day":2}})",
+                          R"({"current":{"time":1799999999,"weather_code":"61","is_day":1}})",
+                          R"({"current":{"time":1799999999,"weather_code":61}})",
+                          R"({"current":{"time":"1799999999","weather_code":61,"is_day":1}})"}) {
     assert(!parse(bad));
+  }
   puts("PASS: weather schema, types, null, unsupported codes, stale/future timestamps");
 }
