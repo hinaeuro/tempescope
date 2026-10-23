@@ -12,5 +12,5 @@
 #define TEMPESCOPE_BENCH_MODE 1
 // ポンプの駆動回路・電流・給水を確認した後にだけ1にする。
 #define TEMPESCOPE_BENCH_PUMP_ENABLED 0
-// リレー駆動・5V電源・ミスト発生器の水深を確認した後にだけ1にする。
-#define TEMPESCOPE_BENCH_MIST_ENABLED 0
+// ミストの2秒試運転を許可。実負荷の試験前にリレー・5V電源・水深を確認する。
+#define TEMPESCOPE_BENCH_MIST_ENABLED 1
