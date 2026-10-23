@@ -7,6 +7,7 @@
 **ESP32S3版は `master` ではなく、`esp32s3/xiao-weather-matter` ブランチにある。**
 
 - [LED・ファン・ポンプ・ミストをUSBコマンドで操作するデモ](https://github.com/hinaeuro/tempescope/blob/esp32s3/xiao-weather-matter/docs/esp32s3/demo-ja.md)
+- [ESP32S3の層構成・静的領域・実装方針](https://github.com/hinaeuro/tempescope/blob/esp32s3/xiao-weather-matter/docs/esp32s3/architecture-ja.md)
 - [ESP32S3版のソースを開く](https://github.com/hinaeuro/tempescope/tree/esp32s3/xiao-weather-matter/firmware/xiao_s3)
 - [日本語の書き込み手順（Windows・Arduino IDE）](https://github.com/hinaeuro/tempescope/blob/esp32s3/xiao-weather-matter/docs/esp32s3/flashing-ja.md)
 - [現在の実装配線と試運転コマンド](https://github.com/hinaeuro/tempescope/blob/esp32s3/xiao-weather-matter/docs/esp32s3/as-built.md)
@@ -17,7 +18,7 @@ GitHub左上のブランチ選択が `master` なら、`esp32s3/xiao-weather-mat
 
 現在はソースからビルド（コンパイル）してUSBで書き込む方式。コンパイル済みの `.bin` やGitHub Releasesは公開していない。
 既定はUSBシリアルの単発試運転モードで、Wi-Fi・Alexaは起動しない。
-2026-10-22の変更後はESP32S3向けフルビルド未完了・実機未検証。詳細は検証記録を参照。
+2026-10-24: BENCH・自動モード（出力禁止/有効）・別デモのESP32S3向けビルドを確認済み。実機での電気的確認は未実施。詳細は検証記録を参照。
 
 ## ファイルの場所
 
@@ -40,3 +41,4 @@ GitHub左上のブランチ選択が `master` なら、`esp32s3/xiao-weather-mat
 - 元プロジェクトのWebサイト: http://tempescope.com
 - 原作者: Ken Kawamoto（ken@kawamoto.co.uk）
 - ライセンス: [LICENSE.txt](LICENSE.txt)
+
